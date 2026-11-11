@@ -575,7 +575,7 @@ with tab_qa:
       "Submit questions directly to the panel chairs or upvote peer inquiries."
   )
 
-  slido_url = "https://app.sli.do/event/ukmrenal2026"
+  slido_url = "https://app.sli.do/event/jTJgeikbEWuQGg2gBT8Rai"
   st.link_button("↗️ Open Q&A Fullscreen", slido_url, use_container_width=True)
   components.iframe(slido_url, height=540, scrolling=True)
 
