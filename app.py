@@ -3,7 +3,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 # ---------------------------------------------------------
-# 1. PAGE SETUP (Mobile First & Favicon)
+# 1. PAGE SETUP (App Icon & Title)
 # ---------------------------------------------------------
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 logo_candidates = ["logo.png", "logo.jpg", "logo.jpeg", "logo.webp"]
@@ -22,7 +22,7 @@ st.set_page_config(
 )
 
 # ---------------------------------------------------------
-# 2. APP STYLING (Modern Slate Theme & Native Card UI)
+# 2. APP STYLING (Hides Browser Chrome, Modern Slate Cards)
 # ---------------------------------------------------------
 st.markdown(
     """
@@ -33,20 +33,28 @@ st.markdown(
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     
-    /* 2. Hide Streamlit Chrome & Headers */
-    #MainMenu, footer, header {
-        visibility: hidden;
-        height: 0px;
+    /* 2. Completely Hide All Streamlit Browser Header & Footer Bars */
+    header[data-testid="stHeader"] {
+        display: none !important;
+    }
+    div[data-testid="stToolbar"] {
+        display: none !important;
     }
     div[data-testid="stDecoration"] {
-        display: none;
+        display: none !important;
+    }
+    div[data-testid="stStatusWidget"] {
+        display: none !important;
+    }
+    #MainMenu, footer {
+        display: none !important;
     }
 
-    /* 3. Mobile Viewport Container */
+    /* 3. Mobile Viewport Layout */
     .block-container {
-        padding-top: 1.5rem;
+        padding-top: 1.2rem;
         padding-bottom: 5rem;
-        max-width: 540px;
+        max-width: 520px;
         margin: 0 auto;
     }
 
@@ -54,9 +62,9 @@ st.markdown(
     .hero-banner {
         background: linear-gradient(145deg, #0f2744 0%, #1e3a8a 50%, #0369a1 100%);
         border-radius: 18px;
-        padding: 22px 20px;
+        padding: 20px 18px;
         color: white;
-        margin-top: 10px;
+        margin-top: 8px;
         margin-bottom: 18px;
         box-shadow: 0 8px 24px -4px rgba(15, 39, 68, 0.25);
         border: 1px solid rgba(255, 255, 255, 0.15);
@@ -75,7 +83,7 @@ st.markdown(
         color: #e0f2fe;
     }
     .hero-title {
-        font-size: 1.38rem;
+        font-size: 1.35rem;
         font-weight: 800;
         margin: 0;
         line-height: 1.25;
@@ -89,7 +97,7 @@ st.markdown(
         line-height: 1.4;
     }
 
-    /* 5. Native Segmented Tab Switcher */
+    /* 5. Mobile Tab Switcher */
     .stTabs [data-baseweb="tab-list"] {
         gap: 6px;
         background-color: #e2e8f0;
@@ -116,7 +124,7 @@ st.markdown(
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
     }
 
-    /* 6. Session Cards */
+    /* 6. Native Session Cards */
     .session-card {
         background: #ffffff;
         border-radius: 16px;
@@ -176,7 +184,7 @@ st.markdown(
     .badge-diet { background: #dcfce7; color: #166534; }
     .badge-default { background: #f1f5f9; color: #475569; }
 
-    /* 8. Synopsis Expander */
+    /* 8. Collapsible Synopsis */
     .streamlit-expanderHeader {
         font-size: 0.82rem !important;
         font-weight: 600 !important;
@@ -189,25 +197,60 @@ st.markdown(
 )
 
 # ---------------------------------------------------------
-# 3. PWA META TAGS (Enables Fullscreen Standalone App Mode)
+# 3. PWA MANIFEST & FULLSCREEN NATIVE APP INJECTION
 # ---------------------------------------------------------
 components.html(
     """
 <script>
+    const myManifest = {
+        "name": "5th UKM Renal Symposium",
+        "short_name": "UKM Renal '26",
+        "start_url": ".",
+        "display": "standalone",
+        "background_color": "#f1f5f9",
+        "theme_color": "#0f2744",
+        "icons": [
+            {
+                "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Universiti_Kebangsaan_Malaysia_logo.svg/192px-Universiti_Kebangsaan_Malaysia_logo.svg.png",
+                "sizes": "192x192",
+                "type": "image/png"
+            },
+            {
+                "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Universiti_Kebangsaan_Malaysia_logo.svg/512px-Universiti_Kebangsaan_Malaysia_logo.svg.png",
+                "sizes": "512x512",
+                "type": "image/png"
+            }
+        ]
+    };
+
+    const stringManifest = JSON.stringify(myManifest);
+    const blob = new Blob([stringManifest], {type: 'application/json'});
+    const manifestURL = URL.createObjectURL(blob);
+
+    let link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = manifestURL;
+    window.parent.document.head.appendChild(link);
+
     let metaApple = document.createElement('meta');
     metaApple.name = 'apple-mobile-web-app-capable';
     metaApple.content = 'yes';
-    document.getElementsByTagName('head')[0].appendChild(metaApple);
+    window.parent.document.head.appendChild(metaApple);
 
     let metaStatus = document.createElement('meta');
     metaStatus.name = 'apple-mobile-web-app-status-bar-style';
     metaStatus.content = 'black-translucent';
-    document.getElementsByTagName('head')[0].appendChild(metaStatus);
+    window.parent.document.head.appendChild(metaStatus);
 
-    let metaChrome = document.createElement('meta');
-    metaChrome.name = 'mobile-web-app-capable';
-    metaChrome.content = 'yes';
-    document.getElementsByTagName('head')[0].appendChild(metaChrome);
+    let metaTitle = document.createElement('meta');
+    metaTitle.name = 'apple-mobile-web-app-title';
+    metaTitle.content = "UKM Renal '26";
+    window.parent.document.head.appendChild(metaTitle);
+
+    let metaTheme = document.createElement('meta');
+    metaTheme.name = 'theme-color';
+    metaTheme.content = '#0f2744';
+    window.parent.document.head.appendChild(metaTheme);
 </script>
 """,
     height=0,
@@ -233,7 +276,7 @@ def render_badge(track_name):
 
 
 # ---------------------------------------------------------
-# 4. SCIENTIFIC PROGRAMME DATA
+# 4. PROGRAMME DATA (Correct Venues & Synopses)
 # ---------------------------------------------------------
 SESSIONS = [
     {
@@ -290,7 +333,7 @@ SESSIONS = [
         "Time": "10:15 - 10:30",
         "Track": "Break",
         "Title": "Morning Tea & Exhibition Viewing",
-        "Speaker": "-",
+        "Speaker": "",
         "Room": "The Gallery",
         "Description": "",
     },
@@ -369,7 +412,7 @@ SESSIONS = [
         "Time": "13:15 - 14:00",
         "Track": "Break",
         "Title": "Lunch & Midday Prayers",
-        "Speaker": "-",
+        "Speaker": "",
         "Room": "The Gallery",
         "Description": "",
     },
@@ -442,8 +485,8 @@ SESSIONS = [
         "Time": "17:00",
         "Track": "Break",
         "Title": "Afternoon Refreshments & CPD Endorsement",
-        "Speaker": "-",
-        "Room": "Auditorium Foyer",
+        "Speaker": "",
+        "Room": "The Gallery",
         "Description": "",
     },
 ]
@@ -504,10 +547,11 @@ with tab_agenda:
       badge = render_badge(row["Track"])
       speaker_html = (
           f'<div class="session-speaker">👨‍⚕️ {row["Speaker"]}</div>'
-          if row["Speaker"] and row["Speaker"] != "-"
+          if row["Speaker"]
           else ""
       )
 
+      # Build card HTML strictly without leading spaces so it never renders as code block
       card_html = f"""<div class="session-card">
 <div class="card-top">
 <span class="session-time">⏰ {row['Time']}</span>
@@ -520,7 +564,7 @@ with tab_agenda:
 
       st.markdown(card_html, unsafe_allow_html=True)
 
-      if row.get("Description"):
+      if row["Description"]:
         with st.expander("Session Synopsis & Clinical Objectives"):
           st.write(row["Description"])
 
@@ -537,12 +581,12 @@ with tab_qa:
 
 # --- TAB 3: ESSENTIAL INFO & CPD ---
 with tab_info:
-  st.subheader("📲 Add to Home Screen")
+  st.subheader("📲 Install App on Phone")
   st.markdown("""
-    Run this companion without the web browser address bar:
+    Run this companion in full-screen mode without browser bars:
     
-    * **iPhone / iPad (Safari):** Tap the **Share icon** (square with an up arrow `⎋`), scroll down, and tap **"Add to Home Screen"**.
-    * **Android (Chrome):** Tap the **three dots menu (`⋮`)** in the top-right corner and tap **"Install App"** or **"Add to Home screen"**.
+    * **iPhone / iPad (Safari):** Tap the **Share icon** (`⎋`), scroll down, and tap **"Add to Home Screen"**.
+    * **Android (Chrome):** Tap the **three dots menu (`⋮`)** and tap **"Install App"** or **"Add to Home screen"**.
     """)
 
   st.divider()
@@ -555,7 +599,7 @@ with tab_info:
 
     ---
     **Dining & Exhibition:**  
-    - Morning tea and lunch will be served at **The Gallery**.
+    - Morning tea, lunch, and afternoon refreshments will be served at **The Gallery**.
 
     ---
     **Wi-Fi Access:**  
